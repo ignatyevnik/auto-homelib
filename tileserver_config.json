@@ -1,0 +1,5 @@
+{
+  "options": {"paths": {"root": "", "fonts": "", "sprites": "", "styles": ""}},
+  "styles": {},
+  "data": {"region-map": {"mbtiles": "/data/ru-by-ge.mbtiles"}}
+}

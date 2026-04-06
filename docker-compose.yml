@@ -1,4 +1,8 @@
+
+### `docker-compose.yml`
+```yaml
 version: "3.8"
+
 services:
   nginx:
     image: nginx:alpine
@@ -56,7 +60,6 @@ services:
     environment:
       - DATABASE_URL=sqlite:///var/www/app/data/db.sqlite
       - BASE_URL=/tasks/
-      - DISABLE_INSTALLATION=1
     mem_limit: 128m
     cpus: 0.5
     restart: unless-stopped
@@ -68,7 +71,6 @@ services:
       - ${HDD1_PATH}/data/apps/trilium:/home/node/trilium-data
     environment:
       - TRILIUM_DATA_DIR=/home/node/trilium-data
-      - TRILIUM_ROOT=/notes
     mem_limit: 512m
     cpus: 1
     restart: unless-stopped

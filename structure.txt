@@ -1,7 +1,23 @@
 offline-library-hub/
-├── docker-compose.yml          # ⬆️ Добавлены kanboard + trilium
-├── nginx/conf.d/default.conf   # ⬆️ Добавлены маршруты /tasks/ и /notes/
-├── html/index.html             # ⬆️ Новые карточки
-├── .env.example                # ⬆️ Переменные для приложений
-├── scripts/01-init-server.sh   # ⬆️ Создание папок для apps
-└── (остальные файлы без изменений)
+├── .env.example
+├── .gitignore
+├── README.md
+├── docker-compose.yml
+├── html/
+│   └── index.html
+├── nginx/
+│   ├── conf.d/
+│   │   └── default.conf
+│   └── setup-auth.sh
+├── filebrowser/
+│   └── config.json
+├── tileserver/
+│   └── config.json
+├── scripts/
+│   ├── 01-init-server.sh
+│   ├── 02-populate.sh
+│   ├── 03-update.sh
+│   ├── backup.sh
+│   └── djvu_to_pdf.sh
+└── docs/
+    └── CONTENT_SOURCES.md

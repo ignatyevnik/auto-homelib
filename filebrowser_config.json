@@ -1,0 +1,9 @@
+{
+  "port": 80,
+  "baseURL": "/files/",
+  "address": "",
+  "log": "stdout",
+  "database": "/config.json",
+  "scope": "/srv",
+  "authMethod": "json"
+}
