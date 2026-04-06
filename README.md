@@ -4,7 +4,7 @@
 Fully autonomous home library, offline maps, task tracker and knowledge base. Works without internet.
 
 # **Disclaimer**
-N \## ENG
+# \## ENG
 The project was created by AI. So do not judge me cruely :)
 
 This project was created to preserve some knowledge in case all the Internet will be shut down due to recent events in the World.
