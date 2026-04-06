@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline Library v2.5</title>
+  <style>
+    :root{--bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--accent:#38bdf8;--accent2:#a78bfa;--accent3:#34d399;--accent4:#f59e0b}
+    body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:2rem;display:flex;flex-direction:column;align-items:center;min-height:100vh}
+    h1{margin:0 0 .5rem;font-size:2rem}
+    .sub{color:#94a3b8;margin-bottom:2rem}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.2rem;width:100%;max-width:950px}
+    .card{background:var(--card);padding:1.3rem;border-radius:10px;text-decoration:none;color:var(--text);transition:.2s;border:1px solid #334155}
+    .card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.4)}
+    .card h2{margin:0 0 .4rem}
+    .card p{margin:0;color:#cbd5e1;font-size:.9rem}
+    .c1 h2{color:var(--accent)} .c2 h2{color:var(--accent2)}
+    .c3 h2{color:var(--accent3)} .c4 h2{color:var(--accent4)}
+    footer{margin-top:2.5rem;color:#64748b;font-size:.8rem;text-align:center}
+  </style>
+</head>
+<body>
+  <h1>📚 Автономная Библиотека v2.5</h1>
+  <p class="sub">Без интернета • ZRAM 8GB • Обновлено: <span id="date"></span></p>
+  <div class="grid">
+    <a href="/library/" class="card c1"><h2>🌍 Энциклопедии</h2><p>Википедия, медицина, справочники (Kiwix)</p></a>
+    <a href="/maps/" class="card c2"><h2>🗺️ Карты</h2><p>Мурманск→Владикавказ, Сев.Кавказ, Грузия, Беларусь</p></a>
+    <a href="/files/" class="card c3"><h2>📁 Учебники & Руководства</h2><p>1-11 класс, советская школа, химия, матанализ</p></a>
+    <a href="/tasks/" class="card c4"><h2>📋 Доска задач</h2><p>Kanban, списки, дедлайны, проекты (Kanboard)</p></a>
+    <a href="/notes/" class="card c4"><h2>📝 Заметки & База знаний</h2><p>Иерархические заметки, шаблоны, код, экспорт (Trilium)</p></a>
+    <a href="/status/" class="card c1"><h2>📊 Мониторинг</h2><p>Нагрузка, диски, логи</p></a>
+  </div>
+  <footer>Xeon E5-1650v1 • 16GB RAM • HDD 2×250GB • 100% Offline</footer>
+  <script>document.getElementById('date').textContent=new Date().toLocaleDateString('ru-RU')</script>
+</body>
+</html>

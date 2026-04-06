@@ -1,0 +1,88 @@
+version: "3.8"
+services:
+  nginx:
+    image: nginx:alpine
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./html:/usr/share/nginx/html:ro
+    mem_limit: 256m
+    cpus: 1
+    restart: unless-stopped
+    networks: [libnet]
+
+  kiwix:
+    image: kiwix/kiwix-serve:3.5.0
+    volumes:
+      - ${HDD1_PATH}/data/zim:/data/zim:ro
+      - ${HDD1_PATH}/data/cache/kiwix:/data/cache:rw
+    command: "--port=8080 --library /data/zim/library.xml --threads 3 --nodate"
+    mem_limit: 3g
+    cpus: 3
+    depends_on: [nginx]
+    restart: unless-stopped
+    networks: [libnet]
+
+  tileserver:
+    image: maptiler/tileserver-gl:latest
+    volumes:
+      - ${HDD1_PATH}/data/maps:/ro
+      - ./tileserver/config.json:/config.json:ro
+    command: "tileserver-gl --config /config.json --public_url /maps --maxCacheSize 512 --cors '*'"
+    mem_limit: 3g
+    cpus: 3
+    depends_on: [nginx]
+    restart: unless-stopped
+    networks: [libnet]
+
+  filebrowser:
+    image: filebrowser/filebrowser:s6
+    volumes:
+      - ${HDD1_PATH}/data/docs:/srv:rw
+      - ./filebrowser/config.json:/config.json:ro
+    environment:
+      - FB_USERNAME=${FB_USERNAME}
+      - FB_PASSWORD=${FB_PASSWORD}
+    mem_limit: 512m
+    cpus: 1
+    restart: unless-stopped
+    networks: [libnet]
+
+  kanboard:
+    image: kanboard/kanboard:latest
+    volumes:
+      - ${HDD1_PATH}/data/apps/kanboard/data:/var/www/app/data
+      - ${HDD1_PATH}/data/apps/kanboard/plugins:/var/www/app/plugins
+    environment:
+      - DATABASE_URL=sqlite:///var/www/app/data/db.sqlite
+      - BASE_URL=/tasks/
+      - DISABLE_INSTALLATION=1
+    mem_limit: 128m
+    cpus: 0.5
+    restart: unless-stopped
+    networks: [libnet]
+
+  trilium:
+    image: zadam/trilium:latest
+    volumes:
+      - ${HDD1_PATH}/data/apps/trilium:/home/node/trilium-data
+    environment:
+      - TRILIUM_DATA_DIR=/home/node/trilium-data
+      - TRILIUM_ROOT=/notes
+    mem_limit: 512m
+    cpus: 1
+    restart: unless-stopped
+    networks: [libnet]
+
+  glances:
+    image: nicolargo/glances:latest-alpine
+    pid: host
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock:ro"]
+    ports: ["61208:61208"]
+    environment: ["GLANCES_OPT=-w"]
+    mem_limit: 512m
+    restart: unless-stopped
+    networks: [libnet]
+
+networks:
+  libnet: {driver: bridge}

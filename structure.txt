@@ -1,0 +1,7 @@
+offline-library-hub/
+├── docker-compose.yml          # ⬆️ Добавлены kanboard + trilium
+├── nginx/conf.d/default.conf   # ⬆️ Добавлены маршруты /tasks/ и /notes/
+├── html/index.html             # ⬆️ Новые карточки
+├── .env.example                # ⬆️ Переменные для приложений
+├── scripts/01-init-server.sh   # ⬆️ Создание папок для apps
+└── (остальные файлы без изменений)
