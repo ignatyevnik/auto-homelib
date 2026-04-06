@@ -1,5 +1,6 @@
 # 📚 Offline Library Hub v2.5
 Полностью автономная домашняя библиотека, оффлайн-карты, система задач и база знаний. Работает без интернета.
+
 Fully autonomous home library, offline maps, task tracker and knowledge base. Works without internet.
 
 # **Disclaimer**
