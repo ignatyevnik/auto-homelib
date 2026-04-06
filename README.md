@@ -18,9 +18,6 @@ The data is needed to be downloaded and moved to the target machine to deploy. I
 
 Most of the files contain tips or what is it about. 
 
-**!!NB!!**
-Some files are named like tileserver_config.json and filebrowser.config.json. They should be located according to the docker-compose.yml file and renamed back to the config.json.
-
  
 \## RU
 
@@ -36,9 +33,6 @@ Some files are named like tileserver_config.json and filebrowser.config.json. Th
 
 Большинство файлов содержит подсказки и что они обозначают.
 
-**!!NB!!**
-Некоторые файл именованы как tileserver_config.json и filebrowser.config.json. Они должны располагаться согласно файлу docker-compose.yml и переименованы обратно в config.json.
-
 
 # ## ⚙️ Требования/Requirements
 - CPU: Intel Xeon E5-1650v1 (Sandy Bridge, AVX)
@@ -49,7 +43,7 @@ Some files are named like tileserver_config.json and filebrowser.config.json. Th
 - OS: Ubuntu 22.04/24.04 Server (Minimal)
 
 # ## Структура файлов и папок/File and Folder Structure 
-https://github.com/ignatyevnik/auto-homelib/blob/main/structure.txt
+
 ````
 offline-library-hub/
 ├── .env.example
