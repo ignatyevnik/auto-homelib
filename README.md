@@ -1,4 +1,6 @@
-# \## ENG
+# 
+**Disclaimer**
+\## ENG
 The project was created by AI. So do not judge me cruely :)
 This project was created to preserve some knowledge in case all the Internet will be shut down due to recent events in the World.
 Feel free to write some of the thoughts on this.
