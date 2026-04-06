@@ -1,5 +1,5 @@
 # 1. Клонирование (или распаковка архива)
-git clone <ваш_репозиторий> ~/offline-library-hub
+git clone <repository> ~/offline-library-hub
 cd ~/offline-library-hub
 
 # 2. Настройка окружения
