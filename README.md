@@ -5,6 +5,7 @@ Fully autonomous home library, offline maps, task tracker and knowledge base. Wo
 
 # **Disclaimer**
 \## ENG
+
 The project was created by AI. So do not judge me cruely :)
 
 This project was created to preserve some knowledge in case all the Internet will be shut down due to recent events in the World.
@@ -22,6 +23,7 @@ Some files are named like tileserver_config.json and filebrowser.config.json. Th
 
  
 \## RU
+
 Данный проект был создан с помощью ИИ, так что не судите строго :)
 
 Проект был создан с целью сохранить некоторые знания, в случае если интернет будет отключен из-за недавних событий в мире.
