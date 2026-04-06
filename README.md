@@ -1,18 +1,20 @@
+# 📚 Offline Library Hub v2.5
+Полностью автономная домашняя библиотека, оффлайн-карты, система задач и база знаний. Работает без интернета.
+Fully autonomous home library, offline maps, task tracker and knowledge base. Works without internet.
+
 # **Disclaimer**
 N \## ENG
 The project was created by AI. So do not judge me cruely :)
+
 This project was created to preserve some knowledge in case all the Internet will be shut down due to recent events in the World.
 Feel free to write some of the thoughts on this.
 With limited resources, but fill of enthusiasm, I would like to share this "attempt" to help secure yourself and have, at least, a possibility to find the information you need about medicine (first-aid), agriculture, fixing auto (but only popular in Russia and former soviet countries), school books and some other things.
 
-The data is needed to be downloaded and moved to the target machine to deploy. It has offline maps for some region. If needed, I can correct the project later to manipulate different packages.
-It contains 
+The data is needed to be downloaded and moved to the target machine to deploy. It has offline maps for some regions of Russian Federation. If needed, I can correct the project later to manipulate different packages.
 
 **Be vary, that is not an easy task, if you are not quite familiar with Linux, docker, nginx, bash or terminal.**
 
 Most of the files contain tips or what is it about. 
-
-System requirements (for my case) are located in the doc CONTENT_SOURCES.md.
 
 **!!NB!!**
 Some files are named like tileserver_config.json and filebrowser.config.json. They should be located according to the docker-compose.yml file and renamed back to the config.json.
@@ -20,22 +22,20 @@ Some files are named like tileserver_config.json and filebrowser.config.json. Th
  
 # \## RU
 Данный проект был создан с помощью ИИ, так что не судите строго :)
+
 Проект был создан с целью сохранить некоторые знания, в случае если интернет будет отключен из-за недавних событий в мире.
 Можете свободно писать свои мысли по этому поводу.
 Полон интузиазма, но с ограниченными ресурсами, я бы хотел поделиться "попыткой" обезопасить себя и, хотя бы иметь возможность найти информацию, которая нужна про медицину (оказание первой помощи), сельское хозяйство, ремонт автомобилей (но только популярные в России и бывших стран СССР), школьные учебники и некоторые другие вещи.
+
+Данные необходимо скачать и перенести на машину, на которой будет развернут проект. Имеются оффлайн карты для некоторых регионов Российской Федерации. Также, если потребуется, я смогу скорректировать проект позже и управлять пакетами.
 
 **Будьте внимательны, так как это может показаться нелегкой задачей, если вы не знакомы с такими вещами как Линукс, докер, сервер nginx, bash или терминал.**
 
 Большинство файлов содержит подсказки и что они обозначают.
 
-Системные требования (для моего случая) находятся в документе CONTENT_SOURCES.md.
-
 **!!NB!!**
 Некоторые файл именованы как tileserver_config.json и filebrowser.config.json. Они должны располагаться согласно файлу docker-compose.yml и переименованы обратно в config.json.
 
-# 📚 Offline Library Hub v2.5
-Полностью автономная домашняя библиотека, оффлайн-карты, система задач и база знаний. Работает без интернета.
-Fully autonomous home library, offline maps, task tracker and knowledge base. Works without internet.
 
 ## ⚙️ Требования/Requirements
 - CPU: Intel Xeon E5-1650v1 (Sandy Bridge, AVX)
@@ -44,6 +44,32 @@ Fully autonomous home library, offline maps, task tracker and knowledge base. Wo
 - HDD1 250 GB → `/mnt/hdd1` (active data)
 - HDD2 250 GB → `/mnt/hdd2` (raw/source files, backup)
 - OS: Ubuntu 22.04/24.04 Server (Minimal)
+
+## Структура файлов и папок на машине
+https://github.com/ignatyevnik/auto-homelib/blob/main/structure.txt
+offline-library-hub/
+├── .env.example
+├── .gitignore
+├── README.md
+├── docker-compose.yml
+├── html/
+│   └── index.html
+├── nginx/
+│   ├── conf.d/
+│   │   └── default.conf
+│   └── setup-auth.sh
+├── filebrowser/
+│   └── config.json
+├── tileserver/
+│   └── config.json
+├── scripts/
+│   ├── 01-init-server.sh
+│   ├── 02-populate.sh
+│   ├── 03-update.sh
+│   ├── backup.sh
+│   └── djvu_to_pdf.sh
+└── docs/
+    └── CONTENT_SOURCES.md
 
 ## 🚀 Быстрый старт/Quick Start
 1. `git clone <repo_url> ~/offline-library-hub`
