@@ -2,7 +2,7 @@
 set -euo pipefail
 echo "🔧 Инициализация сервера v2.5..."
 
-sudo apt update && sudo apt install -y zram-config docker.io docker-compose-v2 rsync jq calibre ddjvu-tools apache2-utils
+sudo apt update && sudo apt install -y zram-config docker.io docker-compose-v2 rsync jq calibre djvulibre-bin apache2-utils
 
 echo "ALGO=zstd" | sudo tee /etc/zram.conf
 echo "PERCENT=50" | sudo tee -a /etc/zram.conf
