@@ -1,23 +1,19 @@
-offline-library-hub/
-├── .env.example
-├── .gitignore
-├── README.md
+auto-homelib/
 ├── docker-compose.yml
-├── html/
-│   └── index.html
+├── .env
+├── Makefile
 ├── nginx/
-│   ├── conf.d/
-│   │   └── default.conf
-│   └── setup-auth.sh
-├── filebrowser/
-│   └── config.json
+│   ├── nginx.conf
+│   ├── dashboard.html
+│   └── .htpasswd
 ├── tileserver/
 │   └── config.json
 ├── scripts/
-│   ├── 01-init-server.sh
-│   ├── 02-populate.sh
-│   ├── 03-update.sh
-│   ├── backup.sh
-│   └── djvu_to_pdf.sh
-└── docs/
-    └── CONTENT_SOURCES.md
+│   ├── mount_hdd.sh
+│   ├── fix_permissions.sh
+│   ├── add_books.sh
+│   └── update_library.sh
+├── kanboard/
+│   └── plugins/
+├── README.md
+└── INSTALL.md

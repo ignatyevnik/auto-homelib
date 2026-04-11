@@ -1,5 +1,11 @@
 {
-  "options": {"paths": {"root": "", "fonts": "", "sprites": "", "styles": ""}},
-  "styles": {},
-  "data": {"region-map": {"mbtiles": "/data/ru-by-ge.mbtiles"}}
+  "options": {
+    "paths": {
+      "root": "/data",
+      "fonts": "/data/fonts",
+      "styles": "/data/styles",
+      "mbtiles": "/data"
+    }
+  },
+  "data": {}
 }

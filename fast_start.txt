@@ -1,0 +1,29 @@
+
+---
+
+## 🚀 **БЫСТРЫЙ ЗАПУСК (КОПИРУЙТЕ ВСЕ КОМАНДЫ)**
+
+```bash
+# 1. Создайте структуру папок
+mkdir -p auto-homelib/{nginx,scripts,tileserver,kanboard/plugins}
+cd auto-homelib
+
+# 2. Создайте все файлы из ответа выше
+
+# 3. Дайте права на выполнение
+chmod +x scripts/*.sh
+
+# 4. Создайте .htpasswd
+docker run --rm -it xmartlabs/htpasswd admin > nginx/.htpasswd
+
+# 5. Монтируйте диски
+sudo ./scripts/mount_hdd.sh
+
+# 6. Исправьте права
+./scripts/fix_permissions.sh
+
+# 7. Запустите
+docker compose up -d
+
+# 8. Проверьте доступ
+curl http://localhost:24
