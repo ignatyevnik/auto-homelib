@@ -1,0 +1,19 @@
+auto-homelib/
+├── docker-compose.yml
+├── .env
+├── Makefile
+├── nginx/
+│   ├── nginx.conf
+│   ├── dashboard.html
+│   └── .htpasswd
+├── tileserver/
+│   └── config.json
+├── scripts/
+│   ├── mount_hdd.sh
+│   ├── fix_permissions.sh
+│   ├── add_books.sh
+│   └── update_library.sh
+├── kanboard/
+│   └── plugins/
+├── README.md
+└── INSTALL.md

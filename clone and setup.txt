@@ -1,0 +1,12 @@
+git clone https://github.com/ignatyevnik/auto-homelib.git
+cd auto-homelib
+
+# Создаем .htpasswd
+docker run --rm -it xmartlabs/htpasswd admin > nginx/.htpasswd
+# Пароль: homelib2024
+
+# Монтируем HDD
+sudo ./scripts/mount_hdd.sh
+
+# Исправляем права
+./scripts/fix_permissions.sh
