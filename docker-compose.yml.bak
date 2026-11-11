@@ -1,0 +1,189 @@
+# ==================== NETWORKS / СЕТИ ====================
+# Docker network for all services / Сеть Docker для всех сервисов
+networks:
+  homelib-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ==================== VOLUMES / ТОМА ====================
+# Persistent data storage / Постоянное хранение данных
+volumes:
+  # Books for Calibre-Web / Книги для Calibre-Web
+  books_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/hdd1/docker/books
+  # Trilium notes data / Данные заметок Trilium
+  trilium_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/hdd2/docker/trilium
+  # Kanboard tasks data / Данные задач Kanboard
+  kanboard_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/hdd2/docker/kanboard
+  # FileBrowser database / База данных FileBrowser
+  filebrowser_db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/hdd2/docker/filebrowser
+
+# ==================== SERVICES / СЕРВИСЫ ====================
+services:
+
+  # -------------------- NGINX (ENTRY POINT :24) / ТОЧКА ВХОДА --------------------
+  # Main reverse proxy and dashboard / Основной реверс-прокси и дашборд
+  nginx:
+    image: nginx:alpine
+    container_name: homelib-nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+      - ./nginx/dashboard.html:/usr/share/nginx/html/index.html:ro
+      - books_data:/usr/share/nginx/html/books:ro
+      - ./nginx/libs:/etc/nginx/html/libs:ro
+    ports:
+      - "0.0.0.0:24:80"  # External port 24 -> internal 80 / Внешний порт 24 -> внутренний 80
+    depends_on:
+      filebrowser:
+        condition: service_started
+      trilium:
+        condition: service_started
+      glances:
+        condition: service_started
+    networks:
+      - homelib-net
+    restart: unless-stopped
+
+  # -------------------- FILEBROWSER (FILE MANAGER) / ФАЙЛОВЫЙ МЕНЕДЖЕР --------------------
+  # Web-based file manager / Веб-файловый менеджер
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: homelib-files
+    volumes:
+      - /mnt/hdd1:/srv/hdd1  # HDD1 mount / Монтирование HDD1
+      - /mnt/hdd2:/srv/hdd2  # HDD2 mount / Монтирование HDD2
+      - filebrowser_db:/database
+    ports:
+      - "8082:80"
+    environment:
+      - FB_USERNAME=admin
+      - FB_PASSWORD=homelib2024
+    command: --address=0.0.0.0 --port=80 --root=/srv
+    networks:
+      - homelib-net
+    restart: unless-stopped
+
+  # -------------------- KANBOARD (TASK MANAGER) / МЕНЕДЖЕР ЗАДАЧ --------------------
+  # Kanban board for task management / Канбан-доска для управления задачами
+  kanboard:
+    image: kanboard/kanboard:latest
+    container_name: homelib-kanboard
+    volumes:
+      - kanboard_data:/var/www/app/data
+      - ./kanboard/plugins:/var/www/app/plugins
+      - ./kanboard/config.php:/var/www/app/config.php:ro
+    ports:
+      - "8081:80"
+    networks:
+      - homelib-net
+    restart: unless-stopped
+
+  # -------------------- TRILIUM (NOTES) / ЗАМЕТКИ --------------------
+  # Hierarchical note-taking application / Иерархическое приложение для заметок
+  trilium:
+    image: zadam/trilium:latest
+    container_name: homelib-trilium
+    volumes:
+      - trilium_data:/home/node/trilium-data
+    environment:
+      - TRILIUM_DATA_DIR=/home/node/trilium-data
+      - TRILIUM_BASE_URL=/notes
+      - TRILIUM_PORT=8080
+    networks:
+      - homelib-net
+    restart: unless-stopped
+
+  # -------------------- GLANCES (SYSTEM MONITOR) / СИСТЕМНЫЙ МОНИТОРИНГ --------------------
+  # Real-time system monitoring / Мониторинг системы в реальном времени
+  glances:
+    image: nicolargo/glances:latest
+    container_name: homelib-glances
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Docker monitoring / Мониторинг Docker
+    pid: "host"  # Host PID namespace for accurate stats / Пространство PID хоста для точной статистики
+    environment:
+      - GLANCES_OPT=-w  # Web mode / Веб-режим
+    ports:
+      - "61208:61208"
+    networks:
+      - homelib-net
+    restart: unless-stopped
+
+  # -------------------- CALIBRE-WEB (E-BOOK LIBRARY) / ЭЛЕКТРОННАЯ БИБЛИОТЕКА --------------------
+  # Web interface for Calibre database / Веб-интерфейс для базы Calibre
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: homelib-calibre
+    volumes:
+      - /mnt/hdd1/docker/books:/books  # Book storage / Хранилище книг
+      - ./calibre-web/config:/config   # Configuration / Конфигурация
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Moscow
+    ports:
+      - "8083:8083"
+    networks:
+      - homelib-net
+    restart: unless-stopped
+
+  # -------------------- KIWIX (OFFLINE WIKI) / ОФФЛАЙН-ВИКИ --------------------
+  # ZIM file server for offline Wikipedia/WikiHow / Сервер ZIM-файлов для оффлайн-Wikipedia
+  #kiwix:
+  #  image: ghcr.io/kiwix/kiwix-tools:latest
+  #  container_name: homelib-kiwix
+  #  volumes:
+  #    - /mnt/hdd1/docker/kiwix:/data
+  #  command: kiwix-serve --port=8080 --skip-zim --nolibrarybutton
+  #  ports:
+  #    - "8084:8080"
+  #  networks:
+  #    - homelib-net
+  #  restart: unless-stopped
+
+  # -------------------- TILESERVER (OFFLINE MAPS) / ОФФЛАЙН-КАРТЫ --------------------
+  # MBTiles server for offline maps / Сервер MBTiles для оффлайн-карт
+  tileserver:
+    image: maptiler/tileserver-gl:latest
+    container_name: homelib-tileserver
+    volumes:
+      - /mnt/hdd2/docker/maps:/data              # Конфиги и стили
+      - /mnt/hdd2/docker/pmtiles:/data/mbtiles   # Карты (MBTiles)
+    ports:
+      - "8085:8080"
+    networks:
+      - homelib-net
+    restart: unless-stopped
+
+  # -------------------- CYBERCHEF (DATA ANALYSIS) / АНАЛИЗ ДАННЫХ --------------------
+  # Swiss Army knife for data manipulation / Швейцарский нож для обработки данных
+  cyberchef:
+    image: ghcr.io/gchq/cyberchef:latest
+    container_name: homelib-cyberchef
+    ports:
+      - "8087:80"
+    networks:
+      - homelib-net
+    restart: unless-stopped

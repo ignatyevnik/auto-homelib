@@ -1,0 +1,15 @@
+kiwix
+
+docker rm -f homelib-kiwix
+docker run -d \
+  --name homelib-kiwix \
+  -p 8084:8080 \
+  -v /mnt/hdd1/docker/kiwix:/data \
+  --restart unless-stopped \
+  ghcr.io/kiwix/kiwix-tools:latest \
+  kiwix-serve --port=8080 --library /data/library.xml
+  
+  
+calibre
+
+docker exec homelib-calibre calibredb add --recurse /books --with-library /books -r

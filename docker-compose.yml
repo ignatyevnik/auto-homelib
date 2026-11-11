@@ -1,6 +1,5 @@
-version: '3.8'
-
-# ==================== СЕТИ ====================
+# ==================== NETWORKS / СЕТИ ====================
+# Docker network for all services / Сеть Docker для всех сервисов
 networks:
   homelib-net:
     driver: bridge
@@ -8,44 +7,31 @@ networks:
       config:
         - subnet: 172.20.0.0/16
 
-# ==================== VOLUMES ====================
+# ==================== VOLUMES / ТОМА ====================
+# Persistent data storage / Постоянное хранение данных
 volumes:
-  zim_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /mnt/hdd1/docker/kiwix
+  # Books for Calibre-Web / Книги для Calibre-Web
   books_data:
     driver: local
     driver_opts:
       type: none
       o: bind
       device: /mnt/hdd1/docker/books
-  downloads_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /mnt/hdd1/downloads
-  maps_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /mnt/hdd2/docker/maps
+  # Trilium notes data / Данные заметок Trilium
   trilium_data:
     driver: local
     driver_opts:
       type: none
       o: bind
       device: /mnt/hdd2/docker/trilium
+  # Kanboard tasks data / Данные задач Kanboard
   kanboard_data:
     driver: local
     driver_opts:
       type: none
       o: bind
       device: /mnt/hdd2/docker/kanboard
+  # FileBrowser database / База данных FileBrowser
   filebrowser_db:
     driver: local
     driver_opts:
@@ -53,100 +39,75 @@ volumes:
       o: bind
       device: /mnt/hdd2/docker/filebrowser
 
-# ==================== СЕРВИСЫ ====================
+# ==================== SERVICES / СЕРВИСЫ ====================
 services:
 
-  # -------------------- NGINX (ТОЧКА ВХОДА) --------------------
+  # -------------------- NGINX (ENTRY POINT :24) / ТОЧКА ВХОДА --------------------
+  # Main reverse proxy and dashboard / Основной реверс-прокси и дашборд
   nginx:
     image: nginx:alpine
     container_name: homelib-nginx
-    user: "1000:1000"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
       - ./nginx/dashboard.html:/usr/share/nginx/html/index.html:ro
       - books_data:/usr/share/nginx/html/books:ro
+      - ./nginx/libs:/etc/nginx/html/libs:ro
+      - ./nginx:/etc/nginx/html:ro
+      - ./nginx/maplibre-gl.js:/usr/share/nginx/html/maplibre-gl.js:ro
+      - ./nginx/maplibre-gl.css:/usr/share/nginx/html/maplibre-gl.css:ro
     ports:
-      - "0.0.0.0:24:8080"  # 🔑 Слушаем на всех интерфейсах
+      - "0.0.0.0:24:80"  # External port 24 -> internal 80 / Внешний порт 24 -> внутренний 80
     depends_on:
-      - kiwix
-      - tileserver
-      - filebrowser
-      - kanboard
-      - trilium
-      - glances
-    networks:
-      - homelib-net
-    restart: unless-stopped
-    environment:
-      - NGINX_ENTRYPOINT_QUIET_LOGS=1
-
-  # -------------------- KIWIX (БИБЛИОТЕКА) --------------------
-  kiwix:
-    image: kiwix/kiwix-serve:latest
-    container_name: homelib-kiwix
-    user: "1000:1000"
-    volumes:
-      - zim_data:/data
-      - downloads_data:/downloaded
-    environment:
-      - http_proxy=${HTTP_PROXY:-}
-      - https_proxy=${HTTPS_PROXY:-}
-    command: "*.zim --port=8080 --address=0.0.0.0 --nolibrarybutton --urlRootLocation=/kiwix"
+      filebrowser:
+        condition: service_started
+      trilium:
+        condition: service_started
+      glances:
+        condition: service_started
     networks:
       - homelib-net
     restart: unless-stopped
 
-  # -------------------- TILESERVER (КАРТЫ) --------------------
-  tileserver:
-    image: maptiler/tileserver-gl:latest
-    container_name: homelib-tileserver
-    user: "1000:1000"
-    volumes:
-      - maps_data:/data
-      - ./tileserver/config.json:/data/config.json:ro
-    environment:
-      - NODE_ENV=production
-    networks:
-      - homelib-net
-    restart: unless-stopped
-
-  # -------------------- FILEBROWSER (ФАЙЛЫ) --------------------
+  # -------------------- FILEBROWSER (FILE MANAGER) / ФАЙЛОВЫЙ МЕНЕДЖЕР --------------------
+  # Web-based file manager / Веб-файловый менеджер
   filebrowser:
     image: filebrowser/filebrowser:latest
     container_name: homelib-files
-    user: "1000:1000"
     volumes:
-      - /mnt/hdd1:/srv/hdd1
-      - /mnt/hdd2:/srv/hdd2
+      - /mnt/hdd1:/srv/hdd1  # HDD1 mount / Монтирование HDD1
+      - /mnt/hdd2:/srv/hdd2  # HDD2 mount / Монтирование HDD2
       - filebrowser_db:/database
+    ports:
+      - "8082:80"
     environment:
-      - FB_BASEURL=/files
-      - FB_PORT=8080
+      - FB_USERNAME=admin
+      - FB_PASSWORD=homelib2024
+    command: --address=0.0.0.0 --port=80 --root=/srv
     networks:
       - homelib-net
     restart: unless-stopped
 
-  # -------------------- KANBOARD (ЗАДАЧИ) --------------------
+  # -------------------- KANBOARD (TASK MANAGER) / МЕНЕДЖЕР ЗАДАЧ --------------------
+  # Kanban board for task management / Канбан-доска для управления задачами
   kanboard:
     image: kanboard/kanboard:latest
     container_name: homelib-kanboard
-    user: "1000:1000"
     volumes:
       - kanboard_data:/var/www/app/data
       - ./kanboard/plugins:/var/www/app/plugins
-    environment:
-      - DATABASE_URL=sqlite:///var/www/app/data/db.sqlite
-      - BASE_URL=/tasks
+      - ./kanboard/config.php:/var/www/app/config.php:ro
+    ports:
+      - "8081:80"
     networks:
       - homelib-net
     restart: unless-stopped
 
-  # -------------------- TRILIUM (ЗАМЕТКИ) --------------------
+  # -------------------- TRILIUM (NOTES) / ЗАМЕТКИ --------------------
+  # Hierarchical note-taking application / Иерархическое приложение для заметок
   trilium:
     image: zadam/trilium:latest
     container_name: homelib-trilium
-    user: "1000:1000"
     volumes:
       - trilium_data:/home/node/trilium-data
     environment:
@@ -157,15 +118,129 @@ services:
       - homelib-net
     restart: unless-stopped
 
-  # -------------------- GLANCES (МОНИТОРИНГ) --------------------
+  # -------------------- GLANCES (SYSTEM MONITOR) / СИСТЕМНЫЙ МОНИТОРИНГ --------------------
+  # Real-time system monitoring / Мониторинг системы в реальном времени
   glances:
     image: nicolargo/glances:latest
     container_name: homelib-glances
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    pid: "host"
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Docker monitoring / Мониторинг Docker
+    pid: "host"  # Host PID namespace for accurate stats / Пространство PID хоста для точной статистики
     environment:
-      - GLANCES_OPT=-w --disable-webui
+      - GLANCES_OPT=-w  # Web mode / Веб-режим
+    ports:
+      - "61208:61208"
     networks:
       - homelib-net
     restart: unless-stopped
+
+  # -------------------- CALIBRE-WEB (E-BOOK LIBRARY) / ЭЛЕКТРОННАЯ БИБЛИОТЕКА --------------------
+  # Web interface for Calibre database / Веб-интерфейс для базы Calibre
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: homelib-calibre
+    volumes:
+      - /mnt/hdd1/docker/books:/books  # Book storage / Хранилище книг
+      - ./calibre-web/config:/config   # Configuration / Конфигурация
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Moscow
+    ports:
+      - "8083:8083"
+    networks:
+      - homelib-net
+    restart: unless-stopped
+
+  # -------------------- KIWIX (OFFLINE WIKI) / ОФФЛАЙН-ВИКИ --------------------
+  # ZIM file server for offline Wikipedia/WikiHow / Сервер ZIM-файлов для оффлайн-Wikipedia
+  #kiwix:
+  #  image: ghcr.io/kiwix/kiwix-tools:latest
+  #  container_name: homelib-kiwix
+  #  volumes:
+  #    - /mnt/hdd1/docker/kiwix:/data
+  #  command: kiwix-serve --port=8080 --skip-zim --nolibrarybutton
+  #  ports:
+  #    - "8084:8080"
+  #  networks:
+  #    - homelib-net
+  #  restart: unless-stopped
+
+  # -------------------- TILESERVER (OFFLINE MAPS) / ОФФЛАЙН-КАРТЫ --------------------
+  # MBTiles server for offline maps / Сервер MBTiles для оффлайн-карт
+  tileserver:
+    image: maptiler/tileserver-gl:latest
+    container_name: homelib-tileserver
+    volumes:
+      - /mnt/hdd2/docker/maps:/data              # Конфиги и стили
+      - /mnt/hdd2/docker/pmtiles:/data/mbtiles   # Карты (MBTiles)
+    ports:
+      - "8086:8080"
+    networks:
+      - homelib-net
+    restart: unless-stopped
+
+  # -------------------- CYBERCHEF (DATA ANALYSIS) / АНАЛИЗ ДАННЫХ --------------------
+  # Swiss Army knife for data manipulation / Швейцарский нож для обработки данных
+  cyberchef:
+    image: ghcr.io/gchq/cyberchef:latest
+    container_name: homelib-cyberchef
+    ports:
+      - "8087:80"
+    networks:
+      - homelib-net
+    restart: unless-stopped
+    
+  # -------------------- NAVIDROME (МУЗЫКАЛЬНЫЙ СЕРВЕР) --------------------
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: homelib-music
+    user: "1000:1000"
+    volumes:
+      - /mnt/hdd1/docker/music:/music:ro      # Ваша музыкальная библиотека
+      - ./navidrome/data:/data                 # База данных Navidrome
+    environment:
+      - ND_SCANSCHEDULE=1h                     # Сканировать каждый час
+      - ND_LOGLEVEL=info
+      - ND_SESSIONTIMEOUT=24h
+      - ND_BASEURL=/music                      # Для прокси через Nginx
+      - ND_ENABLETRANSCODING=false             # Отключаем для экономии CPU
+      - ND_LASTFM_ENABLED=false                # Офлайн-режим
+      - ND_SPOTIFY_ENABLED=false               # Офлайн-режим
+    ports:
+      - "8090:4533"                            # Прямой доступ
+    networks:
+      - homelib-net
+    restart: unless-stopped
+
+  # -------------------- AI AGENT OLLAMA --------------------
+  ollama:
+    image: ollama/ollama:latest
+    container_name: homelib-ollama
+    volumes:
+      - /mnt/hdd2/docker/ollama:/root/.ollama
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    runtime: nvidia
+    ports:
+      - "11434:11434"
+    networks:
+      - homelib-net
+    restart: unless-stopped
+    
+  # -------------------- OPEN WEBUI (ИНТЕРФЕЙС ДЛЯ OLLAMA) --------------------
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: homelib-webui
+    volumes:
+      - /mnt/hdd2/docker/webui:/app/backend/data
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_SECRET_KEY=your_secret_key_here
+    ports:
+      - "8091:8080"
+    networks:
+      - homelib-net
+    restart: unless-stopped
+    depends_on:
+      - ollama

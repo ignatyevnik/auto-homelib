@@ -1,0 +1,14 @@
+# ==================== KIWIX STANDALONE / АВТОНОМНЫЙ KIWIX ====================
+# This runs completely independent of the main stack / Работает полностью независимо от основного стека
+
+services:
+  kiwix:
+    image: ghcr.io/kiwix/kiwix-tools:latest
+    container_name: homelib-kiwix-standalone
+    volumes:
+      - /mnt/hdd1/docker/kiwix:/data
+    command: kiwix-serve --port=8080 --skip-zim --nolibrarybutton
+    ports:
+      - "8084:8080"
+    restart: unless-stopped
+    # NO networks - completely isolated / БЕЗ сетей - полностью изолирован

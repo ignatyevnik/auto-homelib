@@ -2,10 +2,18 @@
   "options": {
     "paths": {
       "root": "/data",
-      "fonts": "/data/fonts",
-      "styles": "/data/styles",
-      "mbtiles": "/data"
+      "mbtiles": "/data",
+      "styles": "/data"
     }
   },
-  "data": {}
+  "styles": {
+    "northwestern": {
+      "style": "style.json"
+    }
+  },
+  "data": {
+    "northwestern": {
+      "mbtiles": "northwestern.mbtiles"
+    }
+  }
 }
