@@ -817,5 +817,5 @@ docker compose up -d
 ---
 
 **Автор:** [@ignatyevnik](https://github.com/ignatyevnik)  
-**Обновлено:** ноябрь 2025  
+**Обновлено:** ноябрь 2026  
 **Версия:** v3.0
